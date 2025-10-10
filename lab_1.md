@@ -73,7 +73,9 @@ sudo nginx -s reload
 Проверили, что работают aliasы
 
 <img width="877" height="361" alt="image" src="https://github.com/user-attachments/assets/233fcf29-042b-47ec-9702-4867ad3a887f" />
-
+<p align=center>
+  <img width="879" height="581" alt="image" src="https://github.com/user-attachments/assets/03452a7a-109e-4238-8f48-6d7429c03afe" />
+</p>
 
 
 
