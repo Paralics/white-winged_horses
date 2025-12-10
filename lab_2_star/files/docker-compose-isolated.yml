@@ -1,0 +1,61 @@
+volumes:
+  db_data:
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: db-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+      interval: 30s
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - db_app_network
+
+
+  app:
+    build: .
+    container_name: predict-app
+    environment:
+      DB_HOST: db
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - db_app_network
+      - app_web_network
+
+
+  nginx:
+    image: nginx:1.25-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - app_web_network
+
+
+networks:
+  db_app_network:
+    driver: bridge
+  app_web_network:
+    driver: bridge
