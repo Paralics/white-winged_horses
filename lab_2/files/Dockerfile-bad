@@ -1,0 +1,16 @@
+FROM ubuntu:latest
+
+RUN apt-get update
+RUN apt-get install -y python3.9 python3-pip
+
+WORKDIR /app
+
+COPY predict.py .
+COPY /local_model ./local_model
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+#подразумевается что predict.py отслеживает stdin
+
+CMD ["python3", "predict.py"]
